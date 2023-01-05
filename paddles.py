@@ -11,10 +11,12 @@ class paddle(Turtle):
         self.shapesize(stretch_wid=1, stretch_len=5)
         
     def f(self):
-        self.forward(15)
+        if self.ycor() < 230:
+            self.forward(15)
         
     def b(self):
-        self.backward(15)
+        if self.ycor() > -225:
+            self.backward(15)
    
         
 

@@ -9,6 +9,7 @@ class circle(Turtle):
         self.home()
         self.movex = 10
         self.movey = 10
+       
         
     def move(self):
         newx = self.xcor() + self.movex
@@ -22,6 +23,11 @@ class circle(Turtle):
     def bouncey(self):
         self.movey *= -1
             
+    def paddle_bouncex(self):
+        self.movex *= -1
+    def paddle_bouncey(self):
+        self.movey *= -1
+        
             
        
     
