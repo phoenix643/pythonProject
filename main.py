@@ -1,46 +1,39 @@
-from tkinter import *
-import pandas
-import random
+import requests
+import datetime
+import time
 
+GENDER = "male"
+WEIGHT_KG = 64
+HEIGHT_CM = 160
+AGE = 18
 
+api_key = "bb75e68dbc6b5e1bfd95688a07eb936b"
+api_id = "eb97e565"
+api_endpoint = "https://trackapi.nutritionix.com/v2/natural/exercise"
+query = input("What exercise did you do?")
 
-BACKGROUND_COLOR = "#B1DDC6"
+current_day = datetime.datetime.now()
 
-french_words = pandas.read_csv("data/french_words.csv")
+parameter = {"query": query,
+             "gender": GENDER,
+             "weight_kg": WEIGHT_KG,
+             "height_cm": HEIGHT_CM,
+             "age": AGE}
 
-window = Tk()
-window.title("Flashcard")
-window.config(bg = BACKGROUND_COLOR, padx=50,pady=50)
+header = {"x-app-id": api_id,
+          "x-app-key": api_key}
 
-card_back = PhotoImage(file="images/card_back.png")
-card_front = PhotoImage(file="images/card_front.png")
-right = PhotoImage(file="images/right.png")
-wrong = PhotoImage(file="images/wrong.png")
-
-canvas = Canvas(height = 550, width = 795,highlightthickness=0,bg= BACKGROUND_COLOR)
-fre_card = canvas.create_image(400,263,image=card_back)
-canvas.grid(row=1,column=1)
-Language = canvas.create_text(400,150, text= "Title", font=("Ariel",40))
-word = canvas.create_text(400,263, text= "The Word", font=("Ariel",40))
-#eng_card= canvas.create_image(image=card_front)
-
-def fr():
-    word.config(text= french_words.loc[random.randint])
-
-
-right_button = Button(image=right)
-right_button.grid(row = 2, column= 0)
-
-wrong_button = Button(image=wrong)
-wrong_button.grid(row= 2, column= 2)
-
-
-
-
-window.mainloop()
-
-
-
-
-
-
+response = requests.post(api_endpoint, json=parameter, headers=header)
+result = response.json()
+sheety_endpoint = "https://api.sheety.co/35580fe88424cf7f9ec7f9b3dd52ed03/myWorkouts/workouts"
+for exercise in result["exercises"]:
+    activity = {"workout":
+                    {"date": f"{current_day.day}/{current_day.month}/{current_day.year}",
+                     "time": str(time.strftime("%H:%M:%S", time.localtime())),
+                     "exercise": exercise["name"].title(),
+                     "duration": exercise["duration_min"],
+                     "calories": exercise["nf_calories"]
+                     }
+                }
+    exercise_response = requests.post(sheety_endpoint, json=activity)
+print(exercise_response.text)
